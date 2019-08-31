@@ -1,0 +1,13 @@
+2019-08-30 16:28:46,174 INFO No binary specified, looking for `pyre.bin` in PATH
+2019-08-30 16:28:46,174 INFO Found: `/usr/local/bin/pyre.bin`
+2019-08-30 16:28:46,174 INFO No typeshed specified, looking for it
+2019-08-30 16:28:46,174 DEBUG Trying with: `/usr/local/lib/python3.7/site-packages/pyre_check/pyre_check/typeshed/`
+2019-08-30 16:28:46,174 DEBUG Trying with: `/usr/local/lib/python3.7/site-packages/pyre_check/typeshed/`
+2019-08-30 16:28:46,174 DEBUG Trying with: `/usr/local/lib/python3.7/pyre_check/typeshed/`
+2019-08-30 16:28:46,174 DEBUG Trying with: `/usr/local/lib/pyre_check/typeshed/`
+2019-08-30 16:28:46,175 INFO Found: `/usr/local/lib/pyre_check/typeshed/`
+2019-08-30 16:28:46,178 WARNING Starting server at `/Users/andr00/Documents/Code/github/visbeat_adenyes/.pyre/shared_analysis_directory`.
+
+2019-08-30 16:28:46,178 INFO Constructing shared directory `/Users/andr00/Documents/Code/github/visbeat_adenyes/.pyre/shared_analysis_directory`
+2019-08-30 16:28:46,178 ERROR No targets or source directories to analyze.
+
