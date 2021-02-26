@@ -2,8 +2,8 @@
 import os
 import json
 
-from AParamDict import *
-import fileui
+from .AParamDict import *
+from . import fileui
 
 
 class AObject(object):

@@ -1,6 +1,6 @@
-from VisBeatDefines import *
-from AImports import *
-from AObject import AObject
+from .VisBeatDefines import *
+from .AImports import *
+from .AObject import AObject
 import numpy as np
 import scipy as sp
 
@@ -27,7 +27,7 @@ import time
 import shutil
 from time import gmtime, strftime, localtime
 import librosa
-from _mediafiles import GetVBMarkPath
+from ._mediafiles import GetVBMarkPath
 
 
 def local_time_string():

@@ -1,11 +1,11 @@
 # CVFunctions
-from VisBeatImports import *
+from .VisBeatImports import *
 import numpy as np
 import scipy as sp
 from PIL import Image as PIM
 
 # from VBObject import *
-import Image as vbImage
+from . import Image as vbImage
 import math
 
 DEFAULT_FLOW_HISTOGRAM_BINS = 8

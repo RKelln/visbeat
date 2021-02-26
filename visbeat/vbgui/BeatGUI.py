@@ -7,8 +7,8 @@ except ImportError as e:
     VIEWER_INSTALLED = 0
     AWARN("VBViewer not installed. Consider installing for full functionality.")
 
-from TimeSignal import *
-from EventList import *
+from ..TimeSignal import *
+from ..EventList import *
 
 
 # this is what media should call to get its gui object

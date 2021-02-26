@@ -1,5 +1,5 @@
 # AImports
-import ADefines as defines
+from . import ADefines as defines
 import os
 import os.path
 import errno
@@ -11,7 +11,7 @@ import shutil
 import time
 from time import gmtime, strftime, localtime
 import random
-import fileui
+from . import fileui
 
 
 try:

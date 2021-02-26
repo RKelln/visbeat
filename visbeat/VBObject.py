@@ -1,8 +1,8 @@
 import os
 import json
-from VisBeatImports import *
-from AFuncDict import *
-from AObject import AObject
+from .VisBeatImports import *
+from .AFuncDict import *
+from .AObject import AObject
 
 
 class VBObject(AObject):

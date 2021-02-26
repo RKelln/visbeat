@@ -1,4 +1,4 @@
-from AObject import *
+from .AObject import *
 
 # import shutil
 from distutils.dir_util import copy_tree

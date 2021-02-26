@@ -1,4 +1,4 @@
-from TimeSignal import *
+from .TimeSignal import *
 import math
 
 

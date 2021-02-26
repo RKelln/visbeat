@@ -1,10 +1,10 @@
 # Image_Base
-# import numpy as np
+import numpy as np
 # import scipy as sp
 from PIL import Image as PIM
 from PIL import ImageDraw, ImageFont
 
-from VisBeatImports import *
+from .VisBeatImports import *
 
 # from PlotUtils import *
 
@@ -239,10 +239,13 @@ class Image(AObject):
             shapeis and shapexyis
         ), "Must provide only one of shape or shape_xy for Image.getScaled"
         if shapeis:
-            sz = [shape[0], shape[1], self.data.shape[2]]
+            #sz = [shape[0], shape[1], self.data.shape[2]]
+            sz = (shape[0], shape[1])
         else:
-            sz = [shape_xy[1], shape_xy[0], self.data.shape[2]]
-        imK = sp.misc.imresize(self.data, size=sz)
+            #sz = [shape_xy[1], shape_xy[0], self.data.shape[2]]
+            sz = (shape_xy[1], shape_xy[0])
+        imK = np.array(PIM.fromarray(self.data).resize(sz))
+        #imK = sp.misc.imresize(self.data, size=sz)
         return Image(data=imK)
 
     def getRotated(self, theta):
@@ -539,7 +542,7 @@ class Image(AObject):
 
 #####################################################
 
-import Image_CV
+from . import Image_CV
 
 if Image_CV.USING_OPENCV:
     Image.USING_OPENCV = Image_CV.USING_OPENCV

@@ -1,4 +1,4 @@
-from AParamDict import *
+from .AParamDict import *
 import pickle as pickle
 import os
 

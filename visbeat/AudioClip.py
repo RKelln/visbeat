@@ -1,4 +1,4 @@
-from Audio import *
+from .Audio import *
 
 
 class AudioClip(Audio):

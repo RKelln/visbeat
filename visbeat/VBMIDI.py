@@ -4,8 +4,8 @@ import numpy as np
 import os
 
 # from TimeSignal1D import *
-from Audio import *
-from Event import *
+from .Audio import *
+from .Event import *
 
 
 class VBMIDITrack(object):

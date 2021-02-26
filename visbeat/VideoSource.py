@@ -1,6 +1,6 @@
-from VisBeatImports import *
-from Video import *
-from AFileManager import AFileManager
+from .VisBeatImports import *
+from .Video import *
+from .AFileManager import AFileManager
 
 try:
     import youtube_dl

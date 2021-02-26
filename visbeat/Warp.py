@@ -1,5 +1,5 @@
-from VisBeatImports import *
-from EventList import *
+from .VisBeatImports import *
+from .EventList import *
 import math
 
 DEFAULT_LEAD_TIME = 0

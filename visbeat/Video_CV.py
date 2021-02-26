@@ -1,7 +1,7 @@
 # from Video import *
-from Image import *
-from Event import *
-from VisualBeat import *
+from .Image import *
+from .Event import *
+from .VisualBeat import *
 import librosa
 
 FEATURE_FUNCS = {}

@@ -1,5 +1,5 @@
-from Video import *
-from AudioClip import *
+from .Video import *
+from .AudioClip import *
 
 
 class VideoClip(Video):

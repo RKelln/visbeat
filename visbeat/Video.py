@@ -1,9 +1,9 @@
 # VideoVersion#from VisBeatImports import *
-from AObject import *
-from TimeSignal import *
-from Audio import *
-from Warp import *
-from Image import *
+from .AObject import *
+from .TimeSignal import *
+from .Audio import *
+from .Warp import *
+from .Image import *
 import moviepy.editor as mpy
 from moviepy.audio.AudioClip import AudioArrayClip as MPYAudioArrayClip
 
@@ -967,7 +967,7 @@ class Video(TimeSignal):
 
 
 Video.FEATURE_FUNCS["frame_indexes"] = Video.getFrameIndexes
-import Video_CV
+from . import Video_CV
 
 if Video_CV.USING_OPENCV:
     Video.FEATURE_FUNCS.update(Video_CV.FEATURE_FUNCS)
@@ -1020,7 +1020,7 @@ else:
         "Was not able to add functions that use OpenCV! Check OpenCV instalation and try again?"
     )
 
-from vbgui import BeatGUI
+from .vbgui import BeatGUI
 
 if BeatGUI.VIEWER_INSTALLED:
 

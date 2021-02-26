@@ -1,4 +1,4 @@
-from VisBeatImports import *
+from .VisBeatImports import *
 
 
 class Event(AObject):

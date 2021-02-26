@@ -1,5 +1,5 @@
-from EventList import *
-from TimeSignal1D import *
+from .EventList import *
+from .TimeSignal1D import *
 from scipy.io.wavfile import write
 import librosa
 import librosa.display
@@ -344,9 +344,9 @@ class Audio(TimeSignal1D):
         return beat_eventlist.events
 
     def AudioClip(self, start, end):
-        import AudioClip
+        from visbeat import AudioClip
 
-        clip = AudioClip.AudioClip(path=self.getPath(), start=start, end=end)
+        clip = AudioClip(path=self.getPath(), start=start, end=end)
         return clip
 
     def getWithSoundAdded(

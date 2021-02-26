@@ -1,19 +1,18 @@
-import VisualBeat
-from VisBeatImports import *
-from Video import *
-from VideoClip import *
-from VideoSource import *
-from VisBeatExampleVideo import VisBeatExampleVideo
+from .VisBeatImports import *
+from .Video import *
+from .VideoClip import *
+from .VideoSource import *
+from .VisBeatExampleVideo import VisBeatExampleVideo
 import re
 import os
 import shutil
 
 
-from SourceLocationParser import ParseSourseLocation
+from .SourceLocationParser import ParseSourseLocation
 
 VISBEAT_ASSETS_DIR = "./VisBeatAssets/"
 
-import fileui
+from . import fileui
 
 fileui.INITIAL_DIR = VISBEAT_ASSETS_DIR
 

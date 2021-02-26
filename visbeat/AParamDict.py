@@ -1,4 +1,4 @@
-from AImports import *
+from .AImports import *
 
 
 class AParamDict(object):
