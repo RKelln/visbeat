@@ -90,6 +90,7 @@ celerybeat-schedule
 .env
 .venv
 env/
+envs/
 venv/
 ENV/
 env.bak/
@@ -107,3 +108,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# vscode
+*.code-workspace
+
+# visbeat
+VisBeatAssets/
