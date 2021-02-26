@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from .AObject import *
 
 # import shutil
@@ -30,19 +32,21 @@ class AFileManager(AObject):
         self.directories = {}
 
     def getJSONName(self):
-        return self.AOBJECT_TYPE() + ".json"
+        return f"{self.AOBJECT_TYPE()}.json"
 
     def initWithPath(self, path=None, clear_temp=None):
+        p = Path(path)
         oldpath = None
-        newpath = path
-        if path:
-            if os.path.isfile(path):
+        newpath = Path(path)
+
+        if p:
+            if os.path.isfile(p):
                 self.loadFromJSON(self.getJSONPath())
                 # assume path property is already set to 'path'
                 oldpath = self.getPath()
                 # whatever was in the json, having overwritten path property
-            elif os.path.isdir(path):
-                json_file_path = path + os.sep + self.getJSONName()
+            elif os.path.isdir(p):
+                json_file_path = p / self.getJSONName()
                 self.setPath(json_file_path)
                 if os.path.isfile(self.getJSONPath()):
                     self.loadFromJSON(json_file_path)
@@ -57,14 +61,14 @@ class AFileManager(AObject):
                 assert (
                     False
                 ), "Given AFileManager path is neither an existing directory or file! path: {} (AFileManager.py)".format(
-                    path
+                    p
                 )
 
             self.setPath(file_path=newpath)
 
             if oldpath:
-                oldir = get_dir_from_path(pathstring(oldpath))
-                newdir = get_dir_from_path(pathstring(newpath))
+                oldir = oldpath.parent
+                newdir = newpath.parent
                 if oldir != newdir:
                     AWARN(
                         "FILEMANAGER FOUND FILE MOVED FROM:\n{}\nTO:\n{}\nUPDATING DIRECTORIES...".format(
@@ -78,11 +82,9 @@ class AFileManager(AObject):
                             self.directories[d] = os.path.join(newdir, dpthst)
                             AWARN("{} updated to {}".format(dpth, self.directories[d]))
 
-            self.setDir(
-                "data", pathstring(self.getDirectoryPath() + os.sep + "Data" + os.sep)
-            )
-            self.setDir("backup", pathstring(self.getDir("data") + "Backups" + os.sep))
-            self.setDir("temp", pathstring(self.getDir("data") + "TEMP" + os.sep))
+            self.setDir("data", self.getDirectoryPath() / "Data")
+            self.setDir("backup", self.getDir("data") / "Backups")
+            self.setDir("temp", self.getDir("data") / "TEMP")
             temp_dir = self.getDir("temp")
             if os.path.isdir(temp_dir) and (clear_temp):
                 for the_file in os.listdir(temp_dir):
@@ -108,9 +110,7 @@ class AFileManager(AObject):
         assert (
             name not in self.directories
         ), "tried to add {} dir to AFileManager, but this dir is already set"
-        return self.setDir(
-            name, pathstring(self.getDirectoryPath() + os.sep + name + os.sep)
-        )
+        return self.setDir(name, self.getDirectoryPath() / name )
 
     def getDir(self, name):
         # printDictionary(self.directories)

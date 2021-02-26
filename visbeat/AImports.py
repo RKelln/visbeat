@@ -12,7 +12,7 @@ import time
 from time import gmtime, strftime, localtime
 import random
 from . import fileui
-
+from pathlib import Path
 
 try:
     from termcolor import colored
@@ -46,18 +46,18 @@ def local_time_string():
 
 
 def get_temp_file_path(final_file_path="TEMP", temp_dir_path=None):
-    pparts = os.path.split(final_file_path)
-    destfolder = pparts[0] + os.sep
-    tempdir = temp_dir_path
+    final_file_path = Path(final_file_path)
+    destfolder = final_file_path.parent
+    tempdir = Path(temp_dir_path)
     if tempdir is None:
-        tempdir = "."
-    destfolder = pathstring(tempdir + os.sep)
-    tempname = "TEMP_" + pparts[1]
+        tempdir = Path(".")
+
+    tempname = f"TEMP_{final_file_path.name}"
     temptry = 0
-    while os.path.isfile(destfolder + tempname):
+    while os.path.isfile(tempdir / tempname):
         temptry = temptry + 1
-        tempname = "TEMP{}_".format(temptry) + pparts[1]
-    return pathstring(destfolder + tempname)
+        tempname = f"TEMP{temptry}_{final_file_path.name}"
+    return tempdir / tempname
 
 
 def runningInNotebook():
@@ -102,21 +102,12 @@ def unpickleFromPath(path):
 
 
 def make_sure_path_exists(path):
-    try:
-        os.makedirs(path)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+    os.makedirs(path, exist_ok=True)
 
 
 def make_sure_dir_exists(path):
-    pparts = os.path.split(path)
-    destfolder = pparts[0] + os.sep
-    try:
-        os.makedirs(destfolder)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+    p = Path(path)
+    os.makedirs(p.parent, exist_ok=True)
 
 
 def safe_file_name(input_string):
@@ -138,15 +129,11 @@ def printOb(obj):
         print("#### Obj.{} = {}\n".format(attr, getattr(obj, attr)))
 
 
-def pathstring(path):
-    return path.replace(os.sep + os.sep, os.sep)
-
-
-def get_prepended_name_file_path(original_file_path, string_to_prepend):
-    pparts = os.path.split(original_file_path)
-    destfolder = pparts[0] + os.sep
-    pname = string_to_prepend + pparts[1]
-    return pathstring(destfolder + pname)
+# def get_prepended_name_file_path(original_file_path, string_to_prepend):
+#     pparts = os.path.split(original_file_path)
+#     destfolder = pparts[0] + os.sep
+#     pname = string_to_prepend + pparts[1]
+#     return pathstring(destfolder + pname)
 
 
 def safe_file_name(input_string):

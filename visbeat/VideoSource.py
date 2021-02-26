@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from .VisBeatImports import *
 from .Video import *
 from .AFileManager import AFileManager
@@ -25,7 +27,7 @@ class VideoSource(AFileManager):
     VIDEO_TEMP_DIR = "./"
 
     def getJSONName(self):
-        return self.AOBJECT_TYPE() + ".json"
+        return f"{self.AOBJECT_TYPE()}.json"
 
     def AOBJECT_TYPE(self):
         return "VideoSource"
@@ -55,11 +57,11 @@ class VideoSource(AFileManager):
     def NewVideoSource(
         destination, name, source_location=None, VideoClass=None, **kwargs
     ):
-        vsdir = os.path.join(destination, name + os.sep)
-        make_sure_dir_exists(vsdir)
-        print("Video source at {}".format(vsdir))
+        vspath = Path(destination, name)
+        make_sure_dir_exists(vspath)
+        print(f"Video source at {vspath}")
         return VideoSource(
-            path=vsdir, name=name, source_location=source_location, **kwargs
+            path=vspath, name=name, source_location=source_location, **kwargs
         )
 
     def initializeBlank(self):
@@ -105,10 +107,10 @@ class VideoSource(AFileManager):
         AFileManager.initWithPath(self, path=path, clear_temp=clear_temp)
         self.setDir(
             "versions",
-            pathstring(self.getDirectoryPath() + os.sep + "Versions" + os.sep),
+            self.getDirectoryPath() / "Versions",
         )
         self.setDir(
-            "warps", pathstring(self.getDir("versions") + os.sep + "Warps" + os.sep)
+            "warps", self.getDir("versions") / "Warps"
         )
         # self.setDir('midi', pathstring(self.getDirectoryPath() + os.sep + "MIDI" + os.sep))
         # self.setDir('music', pathstring(self.getDirectoryPath() + os.sep + "Music" + os.sep))
@@ -118,7 +120,7 @@ class VideoSource(AFileManager):
         if features_dir is None:
             self.setDir(
                 "features",
-                pathstring(self.getDir("data") + os.sep + "Features" + os.sep),
+                self.getDir("data") / "Features",
             )
         else:
             self.setDir("features", features_dir)
@@ -227,7 +229,7 @@ class VideoSource(AFileManager):
                 version_label=version_label, version_group=version_group
             )
         if video_path is not None:
-            version_dict.update({"path": str(pathstring(video_path))})
+            version_dict.update({"path": str(video_path)})
         if kwargs is not None:
             version_dict.update(kwargs)
 
@@ -350,9 +352,9 @@ class VideoSource(AFileManager):
     def getWarpsDir(self, version_label=None):
         warpdir = self.getDir("warps")
         resdir = self._getVersionLabelDirName(version_label=version_label)
-        rdir = pathstring(warpdir + os.sep + resdir + os.sep)
-        make_sure_path_exists(rdir)
-        return rdir
+        path = warpdir / resdir
+        make_sure_path_exists(path)
+        return path
 
     # ############################# FROM ASSETMANAGER #######################
 
@@ -492,20 +494,13 @@ class VideoSource(AFileManager):
         feature_dir = self.getFeatureDir(
             feature_name=feature_name, source_type=source_type
         )
-        fileext = ".pkl"
         if output_dir is None:
-            version = self._getVersionLabelDirName(version_label=version_label) + os.sep
-            output_dir = pathstring(feature_dir)
+            output_dir = feature_dir
         outname = self.getName()
         if outname is None:
             outname = "version"
-        outname = (
-            outname
-            + "_"
-            + self._getVersionLabelDirName(version_label=version_label)
-            + fileext
-        )
-        opath = os.path.join(output_dir, outname)
+        outname = f"{outname}_{self._getVersionLabelDirName(version_label=version_label)}.pkl"
+        opath = Path(output_dir, outname)
         return opath
 
     def getFeatureDir(self, feature_name=None, source_type=None):
@@ -513,15 +508,7 @@ class VideoSource(AFileManager):
             source_type = "video"
             # could be 'audio'
         # AWARN("getDir('features')= {}\nsource_type= {}\nfeature_name= {}".format(self.getDir('features'), source_type, feature_name))
-        ftypedir = pathstring(
-            self.getDir("features")
-            + os.sep
-            + source_type
-            + os.sep
-            + feature_name
-            + os.sep
-        )
-        return ftypedir
+        return self.getDir("features") / source_type / feature_name
 
     def saveFeaturesForVersion(self, version_label=None, output_dir=None):
         assert output_dir, "must provide output dir"

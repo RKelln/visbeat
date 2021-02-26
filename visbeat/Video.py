@@ -15,11 +15,11 @@ from operator import truediv
 
 def MPYWriteVideoFile(mpyclip, filename, **kwargs):
     temp_audio_filename = get_temp_file_path(
-        final_file_path="TEMP_" + filename + ".m4a", temp_dir_path=Video.VIDEO_TEMP_DIR
+        final_file_path=f"TEMP_{filename}.m4a", temp_dir_path=Video.VIDEO_TEMP_DIR
     )
     return mpyclip.write_videofile(
-        filename=filename,
-        temp_audiofile=temp_audio_filename,
+        filename=str(filename),
+        temp_audiofile=str(temp_audio_filename),
         audio_codec="aac",
         **kwargs
     )
@@ -125,7 +125,7 @@ class Video(TimeSignal):
         return self.getDuration()
 
     def getMPYClip(self, get_audio=True):
-        return mpy.VideoFileClip(self.getPath(), audio=get_audio)
+        return mpy.VideoFileClip(str(self.getPath()), audio=get_audio)
 
     def getAudio(self):
         return self.audio
@@ -141,21 +141,20 @@ class Video(TimeSignal):
                 self.num_frames_total = num_frames_total
             else:
                 self.num_frames_total = self.calcNumFramesTotal()
+            if self.num_frames_total == 0:
+                raise RuntimeError("Invalid number of frames in video")
 
             try:
                 self.audio = Audio(self.a_info["file_path"])
                 self.audio.name = self.name
             # except RuntimeError:
             except Exception:
-                print(
-                    "Issue loading audio for {}".format(
-                        self.a_info["file_path"].encode("utf-8")
-                    )
-                )
-                self.audio = Audio(sampling_rate=16000)
-                self.audio.x = np.zeros(
-                    int(np.ceil(self.audio.sampling_rate * self.getDuration()))
-                )
+                print(f"Issue loading audio for {self.a_info['file_path']}")
+                self.audio = Audio(sampling_rate=AUDIO_DEFAULT_SAMPLE_RATE)
+                self.audio.initializeBlank()
+                # self.audio.x = np.zeros(
+                #     int(np.ceil(AUDIO_DEFAULT_SAMPLE_RATE * self.getDuration()))
+                # )
 
     def openVideoWriter(self, output_file_path, fps=None):
         if "outputs" not in self.a_info:
@@ -187,13 +186,16 @@ class Video(TimeSignal):
         valid_frames = 0
         example_frame = self.reader.get_data(0)
         self.setInfo(label="frame_shape", value=example_frame.shape)
-        for i in range(1, self.reader.get_length()):
-            try:
-                self.reader.get_data(i)
-            except imageio.core.format.CannotReadFrameError as e:
-                break
-            valid_frames += 1
-        print("Done.")
+        video_metadata = self.reader.get_meta_data()
+        expected_frames = video_metadata['nframes']
+        if expected_frames <= 1:
+            print(f"Video has invalid number of frames: {expected_frames}")
+        elif expected_frames == math.inf: # stream
+            for i, im in enumerate(self.reader):
+                valid_frames += 1
+        else:
+            valid_frames = expected_frames
+        print(f"Found {valid_frames} frames.")
         return valid_frames
 
     def readFrameBasic(self, i):
@@ -454,7 +456,7 @@ class Video(TimeSignal):
             )
         )
 
-        new_n_samples = target_duration * sampling_rate
+        new_n_samples = int(target_duration * sampling_rate)
         target_start_times = np.linspace(
             target_start, target_end, num=new_n_samples, endpoint=False
         )
@@ -516,7 +518,7 @@ class Video(TimeSignal):
                 output_path=output_path,
                 bitrate=use_bitrate,
             )
-        elif bitrate is "regular":
+        elif bitrate == "regular":
             rvid = Video.CreateFromVideoAndAudioObjects(
                 video=silent_warped_vid,
                 audio=cropped_output_audio,
@@ -613,17 +615,17 @@ class Video(TimeSignal):
             output_sampling_rate = self.sampling_rate
 
         if hasattr(target, "name"):
-            warpname = self.name + "_TO_" + target.name
+            warpname = f"{self.name}_TO_{target.name}"
         else:
-            warpname = self.name + "_TO_TARGETAUDIO" + "_" + str(target.getInfo("name"))
+            warpname = f"{self.name}_TO_TARGETAUDIO_{str(target.getInfo('name'))}"
 
         if name_tag is not None:
-            warpname = warpname + name_tag
+            warpname = f"{warpname}{name_tag}" 
 
-        warpname = warpname + ".mp4"
+        warpname = f"{warpname}.mp4"
 
         if output_path is None:
-            output_path = self.getWarpsDir() + os.sep + warpname
+            output_path = self.getWarpsDir() / warpname
             make_sure_dir_exists(output_path)
 
         if not os.path.isfile(output_path) or force_recompute:
@@ -731,7 +733,7 @@ class Video(TimeSignal):
         if audio_path:
             audio_object = Audio(path=audio_path)
 
-        output_path = output_path.encode(sys.getfilesystemencoding()).strip()
+        #output_path = output_path.encode(sys.getfilesystemencoding()).strip()
         make_sure_dir_exists(output_path)
 
         # audio_sig = audio_object.getSignal()
@@ -753,10 +755,8 @@ class Video(TimeSignal):
         video_duration = video_object.getDuration()
 
         if clip_to_video_length:
-            n_audio_samples_in_vid = int(
-                math.ceil(video_duration * audio_sampling_rate)
-            )
-
+            n_audio_samples_in_vid = math.ceil(video_duration * audio_sampling_rate)
+            
             if n_audio_samples_in_vid < n_audio_samples_sig:
                 if is_stereo:
                     audio_sig = audio_sig[:, : int(n_audio_samples_in_vid)]

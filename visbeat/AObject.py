@@ -1,6 +1,7 @@
 # AO#labels#AObject
 import os
 import json
+from pathlib import Path
 
 from .AParamDict import *
 from . import fileui
@@ -13,7 +14,7 @@ class AObject(object):
             save, load, and clear funcs: these are hooks for functions that manage the object's data on disk.
     """
 
-    AOBJECT_BASE_PATH = None
+    AOBJECT_BASE_PATH = "."
 
     def __init__(self, path=None, **kwargs):
         self.initializeBlank()
@@ -29,22 +30,22 @@ class AObject(object):
 
     def setPath(self, file_path=None, **kwargs):
         if file_path:
-            self.a_info["file_path"] = pathstring(file_path)
-            pparts = os.path.split(self.a_info["file_path"])
-            self.a_info["file_name"] = pparts[1]
-            self.a_info["directory_path"] = pparts[0]
+            p = Path(file_path)
+            self.a_info["file_path"] = p
+            self.a_info["file_name"] = p.name
+            self.a_info["directory_path"] = p.parent
             filename = self.a_info.get("file_name")
             if filename:
-                nameparts = os.path.splitext(filename)
-                self.a_info["file_base_name"] = nameparts[0]
-                self.a_info["file_ext"] = nameparts[1]
-            self.a_info["base_path"] = kwargs.get("base_path")
-            if self.a_info["base_path"] is None:
-                self.a_info["base_path"] = AObject.AOBJECT_BASE_PATH
+                self.a_info["file_base_name"] = p.stem
+                self.a_info["file_ext"] = p.suffix
+            base_path = kwargs.get("base_path")
+            if base_path is None:
+                base_path = AObject.AOBJECT_BASE_PATH
+            self.a_info["base_path"] = Path(base_path)
 
     def getPath(self):
         if "file_path" in self.a_info:
-            return self.a_info["file_path"]
+            return Path(self.a_info["file_path"])
         else:
             return None
 
