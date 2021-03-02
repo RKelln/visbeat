@@ -58,7 +58,7 @@ class VideoSource(AFileManager):
         destination, name, source_location=None, VideoClass=None, **kwargs
     ):
         vspath = Path(destination, name)
-        make_sure_dir_exists(vspath)
+        make_sure_path_exists(vspath)
         print(f"Video source at {vspath}")
         return VideoSource(
             path=vspath, name=name, source_location=source_location, **kwargs
@@ -170,15 +170,7 @@ class VideoSource(AFileManager):
         )
 
     def getDirForVersion(self, version_label=None, version_group=None):
-        vdir = (
-            self.getDir("versions")
-            + os.sep
-            + self._versionGroupString(version_group)
-            + os.sep
-            + self._getVersionLabelDirName(version_label)
-            + os.sep
-        )
-        return vdir
+        return self.getDir("versions") / self._versionGroupString(version_group) / self._getVersionLabelDirName(version_label)
 
     def getVersionInfo(self, version_label, version_group=None, info_label=None):
         """
@@ -239,7 +231,7 @@ class VideoSource(AFileManager):
         if os.path.isfile(self.getJSONPath()):
             os.rename(
                 self.getJSONPath(),
-                self.getDir("backup") + os.sep + self.AOBJECT_TYPE() + ".json",
+                self.getDir("backup") / f"{self.AOBJECT_TYPE()}.json",
             )
         self.writeToJSON(self.getJSONPath())
 
@@ -500,7 +492,7 @@ class VideoSource(AFileManager):
         if outname is None:
             outname = "version"
         outname = f"{outname}_{self._getVersionLabelDirName(version_label=version_label)}.pkl"
-        opath = Path(output_dir, outname)
+        opath = output_dir / outname
         return opath
 
     def getFeatureDir(self, feature_name=None, source_type=None):
@@ -601,7 +593,7 @@ class VideoSource(AFileManager):
         :param kwargs: see setSourceYoutube or setSourceFile for options
         :return:
         """
-
+        
         if source_location:
             if os.path.isfile(source_location):
                 self.setSourceFile(path=source_location, **kwargs)
@@ -630,15 +622,17 @@ class VideoSource(AFileManager):
         if not os.path.isfile(path):
             return None
 
-        self.video_file_name = os.path.basename(path)
+        p = Path(path)
+        #self.video_file_name = os.path.basename(path)
+        self.video_file_name = p.name
         if not copy:
-            self.source_location = path
+            self.source_location = p
             self.setInfo(label="source_type", value="file_address")
-            return path
+            return p
         # output_dir = self.getDir('versions') + os.sep + 'Original' + os.sep
         output_dir = self.getDirForVersion(version_label=None, version_group="Source")
-        make_sure_dir_exists(output_dir)
-        output_path = os.path.join(output_dir, self.video_file_name)
+        make_sure_path_exists(output_dir)
+        output_path = output_dir / self.video_file_name
         # max_height = kwargs.get('max_height')
 
         # if(max_height is not None):
@@ -674,7 +668,7 @@ class VideoSource(AFileManager):
         )
         original = self.VideoClass(path=original_path)
         output_dir = self.getDirForVersion(version_label=max_height, version_group=None)
-        make_sure_dir_exists(output_dir)
+        make_sure_path_exists(output_dir)
         output_path = os.path.join(output_dir, self.video_file_name)
         if max_height is None:
             if os.path.normpath(original_path) != os.path.normpath(output_path):
@@ -729,10 +723,10 @@ class VideoSource(AFileManager):
                 return path_guess
 
         ########Download From YouTube#########
-        vidpath_template = output_dir + "%(title)s-%(id)s" + ".%(ext)s"
+        vidpath_template = output_dir / "%(title)s-%(id)s.%(ext)s"
         ydl_opts = {
             "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-            "outtmpl": vidpath_template,
+            "outtmpl": str(vidpath_template),
         }
         if write_subtitles:
             ydl_opts["writesubtitles"] = True
@@ -763,8 +757,8 @@ class VideoSource(AFileManager):
         )
         usedfilename_withoutext = usedtitle + "-" + info_dict["id"]
         usedfilename = usedfilename_withoutext + "." + info_dict["ext"]
-        filepath = output_dir + os.sep + usedfilename
-        filepathsafe = safe_file_name(filepath)
+        filepath = output_dir / usedfilename
+        filepathsafe = safe_file_name(str(filepath))
         if os.path.isfile(filepath):
             os.rename(filepath, filepathsafe)
         else:

@@ -38,7 +38,6 @@ class AFileManager(AObject):
         p = Path(path)
         oldpath = None
         newpath = Path(path)
-
         if p:
             if os.path.isfile(p):
                 self.loadFromJSON(self.getJSONPath())

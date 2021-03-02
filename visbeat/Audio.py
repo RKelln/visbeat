@@ -23,7 +23,7 @@ class Audio(TimeSignal1D):
         if name is not None:
             self.name = name
         if path:
-            self.loadFile()
+            self.loadFile(file_path=path)
         if self.name is None:
             self.name = self.getInfo("file_name")
 
@@ -515,7 +515,6 @@ class Audio(TimeSignal1D):
             if tightness is not None:
                 beat_args.update(dict(tightness=tightness))
 
-            # print(beat_args)
             tempo, beats = librosa.beat.beat_track(**beat_args)
             self.setFeature(name="tempo", value=tempo)
             self.setFeature(name="beats", value=beats)

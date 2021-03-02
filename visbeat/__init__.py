@@ -20,22 +20,22 @@ fileui.INITIAL_DIR = VISBEAT_ASSETS_DIR
 def SetAssetsDir(assets_dir):
     global VISBEAT_ASSETS_DIR
     VISBEAT_ASSETS_DIR = assets_dir
-    make_sure_dir_exists(assets_dir)
+    make_sure_path_exists(assets_dir)
     AINFORM("VISBEAT_ASSETS_DIR set to {}".format(VISBEAT_ASSETS_DIR))
-    make_sure_dir_exists(GetVideoSourcesDir())
+    make_sure_path_exists(GetVideoSourcesDir())
     temp_dir = os.path.join(VISBEAT_ASSETS_DIR, "TEMP_FILES" + os.sep)
-    make_sure_dir_exists(temp_dir)
+    make_sure_path_exists(temp_dir)
     Video.VIDEO_TEMP_DIR = temp_dir
     fileui.INITIAL_DIR = VISBEAT_ASSETS_DIR
 
 
 def GetAssetsDir():
-    return VISBEAT_ASSETS_DIR
+    return Path(VISBEAT_ASSETS_DIR)
 
 
 def GetVideoSourcesDir():
-    video_sources_dir = os.path.join(GetAssetsDir(), "VideoSources" + os.sep)
-    make_sure_dir_exists(video_sources_dir)
+    video_sources_dir = GetAssetsDir() / "VideoSources"
+    make_sure_path_exists(video_sources_dir)
     return video_sources_dir
 
 
@@ -54,11 +54,12 @@ def PullVideo(name=None, source_location=None, max_height=240, **kwargs):
         vname = name
 
     vs = GetVideoSource(vname)
-    if vs and vs.source_location == source_location:
+    if vs and vs.getName() == vname:
         v = vs.getVersion(max_height=max_height)
         v.load(features_to_load="all")
         return v
 
+    print("Creating new video source")
     vs = VideoSource.NewVideoSource(
         destination=GetVideoSourcesDir(),
         name=vname,
@@ -77,11 +78,11 @@ def ClipVideo(video, time_range, max_height=240):
         version_label="{}_{}".format(str(time_range[0]), str(time_range[1])),
         version_group="Clips",
     )
-    make_sure_dir_exists(vcdir)
+    make_sure_path_exists(vcdir)
     vcname = video.getName() + "clip_{}_{}".format(
         str(time_range[0]), str(time_range[1])
     )
-    vcpath = os.path.join(vcdir, vcname + ".mp4")
+    vcpath = vcdir / f"{vcname}.mp4"
     vclip.write(output_path=vcpath)
     vs = VideoSource.NewVideoSource(
         destination=GetVideoSourcesDir(), name=vcname, source_location=vcpath
@@ -93,7 +94,7 @@ def GetVideoSource(name):
     vname = name
     if isinstance(name, VisBeatExampleVideo):
         vname = name.name
-    path = os.path.join(GetVideoSourcesDir(), vname) + os.sep
+    path = GetVideoSourcesDir() / vname
     if os.path.isdir(path):
         return VideoSource(path=path)
 
@@ -103,7 +104,7 @@ def LoadVideo(name, max_height=240):
     if isinstance(name, VisBeatExampleVideo):
         vname = name.name
 
-    path = os.path.join(GetVideoSourcesDir(), vname) + os.sep
+    path = GetVideoSourcesDir() / vname
     if os.path.isdir(path):
         vs = VideoSource(path=path)
         v = vs.getVersion(max_height=max_height)
@@ -235,7 +236,7 @@ def Dancefer(
             )
             tbeats.append(target_newbeat)
 
-    if warp_type is "weight":
+    if warp_type == "weight":
         vbeats = source_video.visualBeatsFromEvents(vbeats)
 
     if name_tag is None:
@@ -464,7 +465,7 @@ def Dancify(
     if len(tbeats) > len(vbeats):
         tbeats = tbeats[: len(vbeats)]
 
-    if warp_type is "weight":
+    if warp_type == "weight":
         vbeats = source_video.visualBeatsFromEvents(vbeats)
 
     if name_tag is None:

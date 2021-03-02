@@ -7,11 +7,11 @@ import re
 import requests
 import os
 import sys
+import urllib.parse as urlparse
 
-if sys.version_info.major == 3:
-    import urllib.parse as urlparse
-else:
-    import urllib.parse
+from pathlib import Path
+
+
 
 
 class SourceURL(object):
@@ -29,7 +29,7 @@ class SourceURL(object):
     def __init__(self, source_location):
         self.source_location_type = self.SourceLocationType()
         self._source_location = source_location
-
+    
     # <editor-fold desc="Property: 'code'">
     @property
     def code(self):
@@ -75,11 +75,15 @@ class SourceURL(object):
         """
         return self.get_thumbnail_url()
 
+    # implements PathLike
+    def __fspath__(self):
+        return str(self._source_location)
+
     @classmethod
     def is_valid(cls, url):
         return True if cls.re_detect.match(url) else False
 
-
+    
 class WebSourceException(Exception):
     """ Parental class for all embed_media exceptions """
 
@@ -156,6 +160,10 @@ class YoutubeURL(SourceURL):
         "mqdefault.jpg",
     ]
 
+    def __init__(self, source_location):
+        super().__init__(source_location)
+        self._url = urlparse.urlparse(self._source_location)
+
     def get_url(self):
         """
         Returns URL folded from :py:data:`pattern_url` and parsed code.
@@ -179,8 +187,8 @@ class YoutubeURL(SourceURL):
         if match:
             return match.group("code")
 
-        parsed_url = urllib.parse.urlparse(self._source_location)
-        parsed_qs = urllib.parse.parse_qs(parsed_url.query)
+        parsed_url = self._url
+        parsed_qs = urlparse.parse_qs(parsed_url.query)
 
         if "v" in parsed_qs:
             code = parsed_qs["v"][0]
@@ -208,6 +216,10 @@ class YoutubeURL(SourceURL):
                 return temp_thumbnail_url
         return None
 
+    # implements PathLike
+    def __fspath__(self):
+        return str(self._url)
+
 
 class FilePathURL(SourceURL):
     @classmethod
@@ -217,14 +229,20 @@ class FilePathURL(SourceURL):
     def __init__(self, source_location):
         self.source_location_type = self.SourceLocationType()
         self._source_location = source_location
+        self._path = Path(source_location)
 
     @classmethod
     def is_valid(cls, source_location):
         return os.path.isfile(source_location)
 
     def _getCode(self):
-        name_parts = os.path.splitext(os.path.basename(self._source_location))
-        return name_parts[0]
+        return self._path.stem
+        #name_parts = os.path.splitext(os.path.basename(self._source_location))
+        #return name_parts[0]
+
+    # implements PathLike
+    def __fspath__(self):
+        return str(self._path)
 
 
 SOURCE_LOCATION_TYPES = (YoutubeURL, FilePathURL)

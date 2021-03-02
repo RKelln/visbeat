@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="visbeat",
-    version="0.0.9",
+    version="0.0.10",
     author="Abe Davis",
     author_email="everyonehasadance@gmail.com",
     description="Code for 'Visual Rhythm and Beat' SIGGRAPH 2018",
@@ -17,6 +17,7 @@ setuptools.setup(
         "Visual Rhythm and Beat": "http://www.abedavis.com/visualbeat/",
         "Source": "https://github.com/abedavis/visbeat",
         "Demo": "http://www.abedavis.com/visualbeat/demo/",
+        "Fork": "https://github.com/RKelln/visbeat",
     },
     install_requires=[
         "numpy",
@@ -34,7 +35,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=["contrib", "docs", "tests*"]),
     include_package_data=True,
     classifiers=[
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent",
     ],
 )

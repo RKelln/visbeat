@@ -246,7 +246,7 @@ class Warp(AObject):
 
         target_duration = target_end - target_start
 
-        new_n_samples = target_duration * sampling_rate
+        new_n_samples = int(target_duration * sampling_rate)
         target_start_times = np.linspace(
             target_start, target_end, num=new_n_samples, endpoint=False
         )

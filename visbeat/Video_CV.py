@@ -171,7 +171,7 @@ if USING_OPENCV:
         flow_averages = np.zeros([self.n_frames(), 1])
         sampling_rate = self.sampling_rate
         duration = self.getDuration()
-        nsamples = sampling_rate * duration
+        nsamples = int(sampling_rate * duration)
 
         frame_start_times = np.linspace(0, duration, num=nsamples, endpoint=False)
         frame_index_floats = frame_start_times * self.sampling_rate
@@ -239,11 +239,10 @@ if USING_OPENCV:
                 if (time.time() - last_timer) > 10:
                     last_timer = time.time()
                     print(
-                        "{}%% done after {} seconds...".format(
-                            100.0 * truediv(fcounter, len(frame_index_floats)),
-                            last_timer - start_timer,
-                        )
+                        f"{100.0 * truediv(fcounter, len(frame_index_floats)):4.1f}% done",
+                        f"after {last_timer - start_timer:.1f} seconds..."
                     )
+                    
         params = dict(bins=bins, deadzone=dead_zone, density=density)
         params.update(kwargs)
         self.setFeature(name="directogram_powers", value=m_histvals, params=params)
@@ -465,7 +464,7 @@ if USING_OPENCV:
             ei = int(round(b.start * self.sampling_rate * VB_UPSAMPLE_FACTOR))
             b.weight = svbe[ei]
 
-            histsize = 128 / int(np.power(2, HISTOGRAM_DOWNSAMPLE_LEVELS))
+            histsize = 128 // int(np.power(2, HISTOGRAM_DOWNSAMPLE_LEVELS))
             histslice = np.zeros([histsize, HISTOGRAM_FRAMES_PER_BEAT])
             histslice = np.squeeze(np.mean(histslice, 1))
             b.flow_histogram = downsample_hist(

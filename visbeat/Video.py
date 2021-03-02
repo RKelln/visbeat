@@ -18,8 +18,8 @@ def MPYWriteVideoFile(mpyclip, filename, **kwargs):
         final_file_path=f"TEMP_{filename}.m4a", temp_dir_path=Video.VIDEO_TEMP_DIR
     )
     return mpyclip.write_videofile(
-        filename=str(filename),
-        temp_audiofile=str(temp_audio_filename),
+        filename=os.fspath(filename),
+        temp_audiofile=os.fspath(temp_audio_filename),
         audio_codec="aac",
         **kwargs
     )
@@ -149,7 +149,7 @@ class Video(TimeSignal):
                 self.audio.name = self.name
             # except RuntimeError:
             except Exception:
-                print(f"Issue loading audio for {self.a_info['file_path']}")
+                print(f"No audio loaded for {self.a_info['file_path']}")
                 self.audio = Audio(sampling_rate=AUDIO_DEFAULT_SAMPLE_RATE)
                 self.audio.initializeBlank()
                 # self.audio.x = np.zeros(
@@ -278,10 +278,8 @@ class Video(TimeSignal):
                 if (time.time() - last_timer) > 10:
                     last_timer = time.time()
                     print(
-                        "{}%% done after {} seconds...".format(
-                            100.0 * truediv(fcounter, len(frame_index_floats)),
-                            last_timer - start_timer,
-                        )
+                        f"{100.0 * truediv(fcounter, len(frame_index_floats)):4.1f}% done",
+                        f"after {last_timer - start_timer:.1f} seconds..."
                     )
 
         self.closeVideoWriter()
@@ -407,11 +405,10 @@ class Video(TimeSignal):
                 if (time.time() - last_timer) > 10:
                     last_timer = time.time()
                     print(
-                        "{}%% done after {} seconds...".format(
-                            100.0 * truediv(fcounter, len(frame_index_floats)),
-                            last_timer - start_timer,
-                        )
+                        f"{100.0 * truediv(fcounter, len(frame_index_floats)):4.1f}% done",
+                        f"after {last_timer - start_timer:.1f} seconds..."
                     )
+
         self.closeVideoWriter()
         rvid = Video.CreateFromVideoAndAudio(
             video_path=tempfilepath, audio_object=self.audio, output_path=output_path
@@ -494,10 +491,8 @@ class Video(TimeSignal):
                 if (time.time() - last_timer) > 10:
                     last_timer = time.time()
                     print(
-                        "{}%% done after {} seconds...".format(
-                            100.0 * truediv(fcounter, len(frame_index_floats)),
-                            last_timer - start_timer,
-                        )
+                        f"{100.0 * truediv(fcounter, len(frame_index_floats)):4.1f}% done",
+                        f"after {last_timer - start_timer:.1f} seconds..."
                     )
         self.closeVideoWriter()
 
@@ -677,7 +672,7 @@ class Video(TimeSignal):
                 )
             else:
                 output_dir = self.getTempDir()
-            output_path = os.path.join(output_dir, output_name + ".mp4")
+            output_path = output_dir / f"{output_name}.mp4"
             make_sure_dir_exists(output_dir)
         if not os.path.isfile(output_path) or force_recompute:
             if isinstance(events, EventList):
@@ -835,7 +830,7 @@ class Video(TimeSignal):
             for vp in video_paths:
                 vids.append(Video(path=video_paths))
 
-        output_path = output_path.encode(sys.getfilesystemencoding()).strip()
+        #output_path = output_path.encode(sys.getfilesystemencoding()).strip()
         make_sure_dir_exists(output_path)
         basevid = vids[0]
         if audio is None:

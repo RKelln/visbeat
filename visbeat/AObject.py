@@ -106,6 +106,7 @@ class AObject(object):
                     sort_keys=True,
                     indent=4,
                     ensure_ascii=False,
+                    default=AObject.serializer
                 )
 
     def serializeInfo(self):
@@ -144,6 +145,13 @@ class AObject(object):
 
     def initFromDictionary(self, d):
         self.a_info = d.get("a_info")
+
+    @staticmethod
+    def serializer(obj):
+        # Path objects do not natively serialize to JSON
+        if isinstance(obj, Path):
+            return os.fspath(obj)
+        return obj
 
     # ##Example of how these functions should be written in a  subclass, here we call the subclass 'AssetManager'
     # def AOBJECT_TYPE(self):
